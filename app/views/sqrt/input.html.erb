@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script>
+			sqrt_url = location.protocol + "//" + location.host + "/sqrt/view.json";
+
+			function send_query() {
+				var frm = document.forms.sqrt_form;
+				var param_str = "?" + "v=" + frm.val.value;
+				var my_JSON_object = {};
+				var http_request = new XMLHttpRequest();
+				http_request.open("GET", sqrt_url+param_str, true);
+				http_request.onreadystatechange = function () {
+					var done = 4, ok = 200;
+					if (http_request.readyState == done && http_request.status == ok) {
+						my_JSON_object = JSON.parse(http_request.responseText);
+						show_results(my_JSON_object)
+					}
+				};
+				http_request.send(null);
+				return false;
+			}
+
+			function show_results(data) {
+				var result = document.getElementById("result");
+				result.innerHTML = "";
+
+				var table = document.createElement("table");
+				table.border = "1";
+
+				var headerRow = table.insertRow();
+				var iterationHeader = headerRow.insertCell(0);
+				iterationHeader.innerHTML = "Итерация";
+				var valueHeader = headerRow.insertCell(1);
+				valueHeader.innerHTML = "Результат вычисления";
+
+				for (var i = 0; i < data.value.length; i++) {
+					var row = table.insertRow();
+					var iterationCell = row.insertCell(0);
+					iterationCell.innerHTML = i == 0 ? "Ввод" : i;
+					var valueCell = row.insertCell(1);
+					valueCell.innerHTML = data.value[i];
+				}
+
+				result.appendChild(table);
+			}
+		</script>
+	</head>
+	<body>
+		<form name="sqrt_form" method="get">
+			<label>Введите число:</label>
+			<input id="val" name="val" type="text" /> <br/>
+			<input name="commit" type="submit" value="Вычислить корень" onclick="return send_query();" />
+		</form>
+		<div id="result"></div>
+	</body>
+</html>
